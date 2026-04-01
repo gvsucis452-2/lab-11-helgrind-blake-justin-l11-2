@@ -1,5 +1,6 @@
 Blake Collings and Justin Birdsall
-First build main-race.c. Examine the code so you can see the (hopefully obvious) data race in the code. Now run helgrind (by typing valgrind --tool=helgrind ./main-race) to see how it reports the race.
+------------------------------------------------
+1. First build main-race.c. Examine the code so you can see the (hopefully obvious) data race in the code. Now run helgrind (by typing valgrind --tool=helgrind ./main-race) to see how it reports the race.
 
 Does it point to the right lines of code?
 What other information does it give to you?
@@ -38,4 +39,27 @@ Why is this code preferred to the previous version?
 Is it correctness, or performance, or both?
 
 11. Once again run helgrind on main-signal-cv. Does it report any errors?
+-------------------------------------------------
+Answers:
 
+1. After 
+
+2. Commenting out one of the problem lines. 
+
+3. Helgrind reports that after ...
+
+4. Looking at helgrind after adding locks it reports ....
+
+5. Examining this code a deadlock is ...
+
+6. Running helgrind on the deadlocked code reported ....
+
+7. This code is particuarlly innefecient because... This is hilighted by ...
+
+8.
+
+9.
+
+10. This approach is preferred ...
+
+11. Looking at the output of helgrind on main-singal-cv ... 
