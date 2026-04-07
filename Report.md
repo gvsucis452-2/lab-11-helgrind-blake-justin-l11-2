@@ -1,65 +1,113 @@
 Blake Collings and Justin Birdsall
 ------------------------------------------------
-1. First build main-race.c. Examine the code so you can see the (hopefully obvious) data race in the code. Now run helgrind (by typing valgrind --tool=helgrind ./main-race) to see how it reports the race.
+1. 
+First build main-race.c. Examine the code so you can see the (hopefully obvious) data race in the code.
+    
+    a) Run helgrind (by typing valgrind --tool=helgrind ./main-race) to see how it reports the race.
 
-Does it point to the right lines of code?
-What other information does it give to you?
+    b) Does it point to the right lines of code?
 
-2. What happens when you remove (e.g., comment out) one of the offending lines of code?
+    c) What other information does it give to you?
 
-3. Add a lock around one of the updates to the shared variable. What does helgrind report?
+2. 
+    
+    What happens when you remove (e.g., comment out) one of the offending lines of code?
 
-4. Now add locks around both. What does helgrind report?
+3. 
 
-5. Next examine main-deadlock.c. This code has a problem known as deadlock (which we discuss in much more depth in a forthcoming chapter). Based on this code,
+    Add a lock around one of the updates to the shared variable. What does helgrind report?
 
-Describe what a deadlock is.
-Why specifically does this code have a deadlock?
+4. 
+    
+    Now add locks around both. What does helgrind report?
+
+5. 
+Examine main-deadlock.c. This code has a problem known as deadlock. Based on this code,
+
+
+    a) Describe what a deadlock is.
+
+    b) Why specifically does this code have a deadlock?
 
 6. Run helgrind on this code. What does it report?
 
-7. Examine main-deadlock-global.c.
+7. 
+Examine main-deadlock-global.c.
 
-Does it have the same problem that main-deadlock.c has?
-Why or why not?
-Should helgrind be reporting the same error?
-What does this tell you about tools like helgrind?
+    b) Does it have the same problem that main-deadlock.c has?
 
-8. Look at main-signal.c. This code uses a variable (done) to signal that the child is done and that the parent can now continue. Why is this code inefficient? (what does the parent end up spending its time doing, particularly if the child thread takes a long time to complete?)
+    c) Why or why not?
+
+    d) Should helgrind be reporting the same error?
+
+    e) What does this tell you about tools like helgrind?
+
+8. 
+Look at main-signal.c. This code uses a variable (done) to signal that the child is done and that the parent can now continue. 
+
+    a)Why is this code inefficient?
+
+    b) What does the parent end up spending its time doing, particularly if the child thread takes a long time to complete?
 
 
-9. Run helgrind on this program.
+9.
 
-What does it report?
-Is the code correct?
+    a) Run helgrind on this program.
 
-10. Now look at the slightly modified version of the code found in main-signal-cv.c. This version uses a condition variable to do the signaling (and associated lock).
+    b) What does it report?
 
-Why is this code preferred to the previous version?
-Is it correctness, or performance, or both?
+    c) Is the code correct?
 
-11. Once again run helgrind on main-signal-cv. Does it report any errors?
+10. 
+Look at the slightly modified version of the code found in main-signal-cv.c. This version uses a condition variable to do the signaling (and associated lock).
+
+    a) Why is this code preferred to the previous version?
+
+    b) Is it correctness, or performance, or both?
+
+11. 
+Once again run helgrind on main-signal-cv.
+
+    Does running helgrind on main-signal-cv report any errors?
 -------------------------------------------------
 Answers:
 
-1. After 
+1. 
+    
+    After running helgrind on the main-race program it does point to the correct lines of code.
 
-2. Commenting out one of the problem lines. 
+2. 
 
-3. Helgrind reports that after ...
+    Commenting out one of the problem lines. 
 
-4. Looking at helgrind after adding locks it reports ....
+3. 
 
-5. Examining this code a deadlock is ...
+    Helgrind reports that after ...
 
-6. Running helgrind on the deadlocked code reported ....
+4. 
 
-7. This code is particuarlly innefecient because... This is hilighted by ...
+    Looking at helgrind after adding locks it reports ....
+
+5. 
+
+    Examining this code a deadlock is ...
+
+6. 
+
+    Running helgrind on the deadlocked code reported ....
+
+7. 
+
+    This code is particuarlly innefecient because... This is hilighted by ...
 
 8.
 
 9.
 
-10. This approach is preferred ...
+10. 
 
-11. Looking at the output of helgrind on main-singal-cv ... 
+    This approach is preferred ...
+
+11. 
+
+    Looking at the output of helgrind on main-singal-cv ... 
