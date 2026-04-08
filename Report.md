@@ -1,4 +1,4 @@
-Blake Collings and Justin Birdsall
+Blake Collins and Justin Birdsall
 ------------------------------------------------
 1. 
 First build main-race.c. Examine the code so you can see the (hopefully obvious) data race in the code.
@@ -74,7 +74,14 @@ Answers:
 
 1. 
     
-    After running helgrind on the main-race program it does point to the correct lines of code.
+    After running helgrind on the main-race program it does point to the correct lines of code, correctly pointing
+    out that our threads after cloning have a race condition to starting their own new threads. Once our second 
+    thread is created both thread 1 (our root thread) and thread 2 our sharing the same memory space as thread 1, 
+    as thread 2 beats thread 1 to and starts creating thread 442 thread one has no locks and also goes to create a 
+    thread 442. This race condition could create possible unitented consequenses to our program. 
+
+    Looking at 
+![Main-Race_output1](image.png)
 
 2. 
 
