@@ -29,7 +29,9 @@ Examine main-deadlock.c. This code has a problem known as deadlock. Based on thi
 
     b) Why specifically does this code have a deadlock?
 
-6. Run helgrind on this code. What does it report?
+6. 
+
+    Run helgrind on this code. What does it report?
 
 7. 
 Examine main-deadlock-global.c.
@@ -47,7 +49,8 @@ Look at main-signal.c. This code uses a variable (done) to signal that the child
 
     a)Why is this code inefficient?
 
-    b) What does the parent end up spending its time doing, particularly if the child thread takes a long time to complete?
+    b) What does the parent end up spending its time doing, particularly if the child thread takes a long time to 
+    complete?
 
 
 9. 
@@ -109,24 +112,37 @@ Answers:
 
 5. 
 
-    Examining this code a deadlock is ...
+    Examining this code a deadlock is within a how we are passing locks. We end up creating a situation where both locks
+    hold and are waiting to release. 
 
 6. 
 
-    Running helgrind on the deadlocked code reported 
+    Running helgrind on the deadlocked code reported that we indeed have this situation of a lock order violation.
+
+![alt text](image-6.png)
 
 7. 
 
-    This code is particuarlly innefecient because... This is hilighted by ...
+    This 
 
-8.
+8. 
+
+    This code is particularly inefficient because we are constantly checking lock/turn within a while loop his is highlighted by ...
+
 
 9.
 
+    Running this program with Helgrind shows that our code is not correct and has race conditions. 
+
+![alt text](image-9.png)
+
 10. 
 
-    This approach is preferred ...
+    This approach is preferred since we are doing ridding of the constant drain on the cpu while looping 
+    we instead sleep a threads 
 
 11. 
 
-    Looking at the output of helgrind on main-singal-cv ... 
+    Looking at the output of helgrind on main-singal-cv, it indeed ran with no errors. 
+
+![alt text](image-7.png)
