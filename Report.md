@@ -1,148 +1,52 @@
 Blake Collins and Justin Birdsall
 ------------------------------------------------
-1. 
-First build main-race.c. Examine the code so you can see the (hopefully obvious) data race in the code.
-    
-    a) Run helgrind (by typing valgrind --tool=helgrind ./main-race) to see how it reports the race.
 
-    b) Does it point to the right lines of code?
+### Answers
 
-    c) What other information does it give to you?
+**1.** Helgrind reports a **data race** on the shared counter `balance`: both the main thread and the worker run `balance++` with no happens-before relationship between those accesses. It points at the **`balance++` lines** in `worker` and `main`. It also shows which threads are involved, call stacks, and (often) possible conflicting access ordering.
 
-2. 
-    
-    What happens when you remove (e.g., comment out) one of the offending lines of code?
+**2.** Commenting out **one** of the two `balance++` lines removes the concurrent write to `balance`, so there is no longer a race on that variable (only one thread updates it).
 
-3. 
+**3.** Protecting **only one** of the two increments with a mutex still leaves the **other** increment unsynchronized, so Helgrind still reports a **data race** (one unprotected conflicting access is enough).
 
-    Add a lock around one of the updates to the shared variable. What does helgrind report?
+**4.** With a proper mutex protecting **both** increments (lock before `balance++`, unlock after), the conflicting accesses are ordered and Helgrind should report **no data races** on `balance` for this program.
 
-4. 
-    
-    Now add locks around both. What does helgrind report?
+**5.**
 
-5. 
-Examine main-deadlock.c. This code has a problem known as deadlock. Based on this code,
+- **a)** A **deadlock** is when a set of threads (or processes) each hold some resource and wait on another resource held by someone else in the set, so no one can make progress.
 
+- **b)** In `main-deadlock.c`, one thread locks **m1 then m2** and the other locks **m2 then m1**. The two threads can each take their **first** mutex and then block forever waiting for the second—the classic **lock ordering** deadlock.
 
-    a) Describe what a deadlock is.
+**6.** Helgrind reports a **lock order violation** / potential deadlock (ordering of `m1` and `m2` differs between threads), consistent with the inconsistent lock acquisition order.
 
-    b) Why specifically does this code have a deadlock?
+**7.**
 
-6. 
+- **b)** **No.** `main-deadlock-global.c` adds mutex **`g`** and each worker locks **`g` before** taking `m1`/`m2`. Only one thread at a time can enter the inner lock sequence, so the two threads cannot hold **m1 vs m2** in the bad pattern at the same time.
 
-    Run helgrind on this code. What does it report?
+- **c)** The extra mutex **serializes** the critical section that takes `m1` and `m2`, breaking the circular wait needed for deadlock.
 
-7. 
-Examine main-deadlock-global.c.
+- **d)** Helgrind may **not** report the same deadlock here because the dangerous interleaving is prevented; tools report what the execution model allows.
 
-    b) Does it have the same problem that main-deadlock.c has?
+- **e)** **False negatives/positives** are possible: tools approximate behavior; fixing ordering in one place can hide a pattern that would deadlock without the global lock.
 
-    c) Why or why not?
+**8.**
 
-    d) Should helgrind be reporting the same error?
+- **a)** The parent **busy-waits** in `while (done == 0) ;`—a spin loop.
 
-    e) What does this tell you about tools like helgrind?
+- **b)** The parent burns **CPU** until `done` becomes 1. If the child takes a long time, the parent keeps spinning the whole time instead of sleeping.
 
-8. 
-Look at main-signal.c. This code uses a variable (done) to signal that the child is done and that the parent can now continue. 
+**9.**
 
-    a)Why is this code inefficient?
+- **a)** Helgrind reports a **data race** on `done` (and possibly other issues): the child writes `done` while the main thread reads it in the spin loop with no synchronization.
 
-    b) What does the parent end up spending its time doing, particularly if the child thread takes a long time to 
-    complete?
+- **b)** The intended order often “works,” but it is **not** correctly synchronized in the C memory model sense—undefined behavior is possible; use atomics or a mutex + condition variable.
 
+**10.**
 
-9. 
-Run helgrind on this program.
+- **a)** Condition variables let the parent **block** efficiently until the child signals, instead of spinning.
 
-    a) What does it report?
+- **b)** **Both:** correct synchronization (mutex protects `done`) and **much better performance** (no busy-wait).
 
-    b) Is the code correct?
+**11.** With mutex + condition variable used consistently, Helgrind on `main-signal-cv` should report **no data races** for this pattern (assuming no other bugs).
 
-
-10. 
-Look at the slightly modified version of the code found in main-signal-cv.c. This version uses a condition variable to do the signaling (and associated lock).
-
-    a) Why is this code preferred to the previous version?
-
-    b) Is it correctness, or performance, or both?
-
-11. 
-Once again run helgrind on main-signal-cv.
-
-    Does running helgrind on main-signal-cv report any errors?
--------------------------------------------------
-Answers:
-
-1. 
-    
-    After running helgrind on the main-race program it does point to the correct lines of code, correctly pointing
-    out that our threads race towards, incrementing a counter to create new threads. The output shows our second 
-    thread is created both thread 1 (our root thread) and thread 2 our sharing the same memory space as thread 1, 
-    as thread 2 beats thread 1 to and starts creating thread 442. thread one has no locks and also goes to create 
-    a thread 442. This race condition could create possible unintended consequences to our program. 
-
-    Looking at 
-![Main-Race_output1](image.png)
-
-2. 
-
-    Commenting out one of the problem of racing towards the incrementor in main removes the race condition.
-    the one singular thread increments the counter removing our root racing to change the int. 
-
-![alt text](image-1.png)
-
-3. 
-
-    Helgrind reports that after adding a lock around our previous commented out line that, our program still
-    contains a race condition.
-
-![alt text](image-2.png)
-![alt text](image-3.png)
-
-4. 
-
-    Adding a second lock around our worker functions incrementor and reports actually double the errors and 
-    contexts from 2 to 4. This is due to our locks also not implementing a queuing system. our threads are all 
-    dog pilling onto the same lock creating a scenario where multiple threads execute through the lock
-
-![alt text](image-4.png)
-![alt text](image-5.png)
-
-5. 
-
-    Examining this code a deadlock is within a how we are passing locks. We end up creating a situation where both locks
-    hold and are waiting to release. 
-
-6. 
-
-    Running helgrind on the deadlocked code reported that we indeed have this situation of a lock order violation.
-
-![alt text](image-6.png)
-
-7. 
-
-    This 
-
-8. 
-
-    This code is particularly inefficient because we are constantly checking lock/turn within a while loop his is highlighted by ...
-
-
-9.
-
-    Running this program with Helgrind shows that our code is not correct and has race conditions. 
-
-![alt text](image-9.png)
-
-10. 
-
-    This approach is preferred since we are doing ridding of the constant drain on the cpu while looping 
-    we instead sleep a threads 
-
-11. 
-
-    Looking at the output of helgrind on main-singal-cv, it indeed ran with no errors. 
-
-![alt text](image-7.png)
+------------------------------------------------

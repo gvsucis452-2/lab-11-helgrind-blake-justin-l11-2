@@ -1,6 +1,6 @@
 # Helgrind
 
-(Note: This is a very slightly modified version of the homework problems from [Chapter 27 of the OSTEP textbook](https://pages.cs.wisc.edu/~remzi/OSTEP/threads-api.pdf]).
+(Note: This is a very slightly modified version of the homework problems from [Chapter 27 of the OSTEP textbook](https://pages.cs.wisc.edu/~remzi/OSTEP/threads-api.pdf).)
 
 For this lab, you'll use a real tool on Linux to find problems in
 multi-threaded code. The tool is called `helgrind` (available as part of the
