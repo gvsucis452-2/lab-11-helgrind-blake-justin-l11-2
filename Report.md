@@ -25,7 +25,7 @@ Blake Collins and Justin Birdsall
 
 - **c)** The extra mutex **serializes** the critical section that takes `m1` and `m2`, breaking the circular wait needed for deadlock.
 
-- **d)** Helgrind may **not** report the same deadlock here because the dangerous interleaving is prevented; tools report what the execution model allows.
+- **d)** Helgrind may **not** report the same deadlock here because the dangerous interleaving is prevented; tools report what the execution model allows.  **zk** What do you mean by "may not"?  What did you observe?
 
 - **e)** **False negatives/positives** are possible: tools approximate behavior; fixing ordering in one place can hide a pattern that would deadlock without the global lock.
 
